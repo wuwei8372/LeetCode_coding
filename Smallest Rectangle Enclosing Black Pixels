@@ -1,0 +1,112 @@
+#Smallest Rectangle Enclosing Black Pixels
+
+#Given a 2D grid, each cell is either a wall 2, an house 1 or empty 0 (the number zero, one, two), find a place to build a post office so that the sum of the distance from the post office to all the houses is smallest.
+
+#Return the smallest sum of distance. Return -1 if it is not possible.
+
+public class Solution {
+    /**
+     * @param image a binary matrix with '0' and '1'
+     * @param x, y the location of one of the black pixels
+     * @return an integer
+     */
+    public int minArea(char[][] image, int x, int y) {
+        // Write your code here
+        int height = image.length - 1;
+        int width = image[0].length - 1;
+        
+        int top = searchBorderTop(0, x, image);
+        int bottom = searchBorderBottom(x, height, image);
+        int left = searchBorderLeft(0, y, image);
+        int right = searchBorderRight(y, width, image);
+        
+        //System.out.println(top + "" + bottom + "" + left + "" + right);
+        
+        int anw = (bottom - top + 1) * (right - left + 1);
+        return anw;
+    }
+    
+    private int searchBorderTop(int start, int end, char[][] image) {
+        while (start + 1 < end) {
+            int mid = start + (end - start) / 2;
+            if (isEmptyRow(mid, image)) {
+                start = mid;
+            } else {
+                end = mid;
+            }
+        }
+            if (!isEmptyRow(start, image)) {
+                return start;
+            } else {
+                return end;
+            }
+    }
+    private int searchBorderBottom(int start, int end, char[][] image) {
+        while (start + 1 < end) {
+            int mid = start + (end - start) / 2;
+            if (isEmptyRow(mid, image)) {
+                end = mid;
+            } else {
+                start = mid;
+            }
+        }
+            if (!isEmptyRow(end, image)) {
+                return end;
+            } else {
+                return start;
+            }
+    }
+    
+    
+    private int searchBorderLeft(int start, int end, char[][] image) {
+        while (start + 1 < end) {
+            int mid = start + (end - start) / 2;
+            if (isEmptyColumn(mid, image)) {
+                start = mid;
+            } else {
+                end = mid;
+            }
+        }    
+            if (!isEmptyColumn(start, image)) {
+                return start;
+            } else {
+                return end;
+            }
+    }
+    
+    private int searchBorderRight(int start, int end, char[][] image) {
+        while (start + 1 < end) {
+            int mid = start + (end - start) / 2;
+            if (isEmptyColumn(mid, image)) {
+                end = mid;
+            } else {
+                start = mid;
+            }
+        }    
+            if (!isEmptyColumn(end, image)) {
+                return end;
+            } else {
+                return start;
+            }
+    }
+    
+    
+    private boolean isEmptyRow(int n, char[][] image) {
+        for (int i = 0; i < image[n].length; i++) {
+            if (image[n][i] == '1') {
+                return false;
+            } 
+        }
+        return true;
+    }
+    
+    private boolean isEmptyColumn(int n, char[][] image) {
+        for (int i = 0; i < image.length; i++) {
+            if (image[i][n] == '1') {
+                return false;
+            } 
+        }
+        return true;
+    }
+    
+}
