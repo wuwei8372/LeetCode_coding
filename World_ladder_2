@@ -1,0 +1,109 @@
+#Given a 2D grid, each cell is either a wall 2, an house 1 or empty 0 (the number zero, one, two), find a place to build a post office so that the sum of the distance from the post office to all the houses is smallest.
+
+#Return the smallest sum of distance. Return -1 if it is not possible.
+
+class Coordinate{
+    int x;
+    int y;
+    public Coordinate(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+public class Solution {
+    /**
+     * @param grid a 2D grid
+     * @return an integer
+     */
+    public int EMPTY = 0;
+    public int HOUSE = 1;
+    public int WALL = 2;
+    public int[] dirX = {0,0,1,-1};
+    public int[] dirY = {1,-1,0,0};
+    public int rowNum;
+    public int colNum;
+    public int shortestDistance(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return -1;
+        }
+        
+        rowNum = grid.length;
+        colNum = grid[0].length;
+        
+        List<Coordinate> emptyList = getType(EMPTY, grid);
+        List<Coordinate> houseList = getType(HOUSE, grid);
+        
+        int[][] visitedTime = new int[rowNum][colNum];
+        int[][] disSum = new int[rowNum][colNum];
+        
+        for (Coordinate house : houseList) {
+            bfs(house, visitedTime, disSum, grid);
+        }
+        
+        int shortest = Integer.MAX_VALUE;
+        for (Coordinate empty : emptyList) {
+            if (visitedTime[empty.x][empty.y] != houseList.size()) {
+                continue;
+            }
+            shortest = Math.min(shortest, disSum[empty.x][empty.y]);
+        }
+        //none of the empty can reach all houses
+        if (shortest == Integer.MAX_VALUE) {
+            return -1;
+        }
+        
+        return shortest;
+    }
+    private List<Coordinate> getType(int type, int[][] grid) {
+        List<Coordinate> result = new ArrayList<>();
+        for (int i = 0; i < rowNum; i++) {
+            for (int j = 0; j < colNum; j++) {
+                if (grid[i][j] == type) {
+                    result.add(new Coordinate(i,j));
+                }
+            }
+        }
+        return result;
+    }
+    private void bfs(Coordinate house, int[][] visitedTime, int[][] disSum, int[][] grid) {
+        boolean[][] visited = new boolean[rowNum][colNum];
+        Queue<Coordinate> queue = new LinkedList<>();
+        queue.offer(house);
+        visited[house.x][house.y] = true;
+        int step = 0;
+        while(!queue.isEmpty()) {
+            int size = queue.size();
+            step++;
+            for (int i = 0; i < size; i++) {
+                Coordinate coor = queue.poll();
+                
+                for (int j = 0; j < 4; j++) {
+                    Coordinate coorNei = new Coordinate(coor.x + dirX[j],
+                                                        coor.y + dirY[j]);
+                    if (!isBound(coorNei, grid)) {
+                        continue;
+                    }
+                    if (visited[coorNei.x][coorNei.y] == true) {
+                        continue;
+                    }
+                    queue.offer(coorNei);
+                    visited[coorNei.x][coorNei.y] = true;
+                    visitedTime[coorNei.x][coorNei.y]++;
+                    disSum[coorNei.x][coorNei.y] += step;
+                }
+            }
+        }
+        
+    }
+    private boolean isBound(Coordinate coor, int[][] grid) {
+        if (coor.x < 0 || coor.x >= rowNum) {
+            return false;
+        }
+        if (coor.y < 0 || coor.y >= colNum) {
+            return false;
+        }
+        
+        return grid[coor.x][coor.y] == EMPTY;
+    }
+}
